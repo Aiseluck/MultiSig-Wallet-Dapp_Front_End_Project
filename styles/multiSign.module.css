@@ -3,12 +3,16 @@
   flex-direction: column;
   justify-content: space-between;
   align-items: center;
+  height: 100%;
+  color: #5ed5a8;
 }
 
 .import {
   display: flex;
   flex-direction: column;
   align-items: center;
+  flex-basis: 25%;
+  justify-content: space-around;
 }
 
 .input {
@@ -24,12 +28,35 @@
 }
 
 .createWallet,
-.addresses {
+.addresses,
+.validator,
+.walletName {
   display: flex;
   flex-direction: column;
   align-items: center;
 }
 
+.createWallet {
+  flex-basis: 70%;
+  justify-content: space-around;
+}
+
 .owner {
   display: flex;
+}
+
+.main input {
+  border: none;
+  text-align: center;
+  font-weight: bold;
+}
+
+.main button {
+  background-color: #5ed5a8;
+  height: 10px;
+  color: #171d22;
+}
+
+.owner input {
+  margin: 5px 0px;
 }
