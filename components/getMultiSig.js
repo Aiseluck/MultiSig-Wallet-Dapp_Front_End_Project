@@ -1,5 +1,5 @@
 import multiSig from "@/styles/multiSign.module.css";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { utils } from "ethers";
 import createWalletTx from "@/utils/createWalletTransaction";
 import checkDeployedWalletTx from "@/utils/deployedWalletTransaction";
@@ -9,8 +9,7 @@ function MultiSig() {
   const [numConfirmation, setNumConfirmation] = useState(1);
   const [walletName, setWalletName] = useState("");
   const [addressOk, setAdressOk] = useState(false);
-
-  console.log(addressList);
+  const [processTx, setProcessTx] = useState(false);
 
   const checkAddress = (_addresses) => {
     let addresses_ok = true;
@@ -51,6 +50,25 @@ function MultiSig() {
   const handleWalletName = (e) => {
     setWalletName(e.target.value);
   };
+
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      console.log("Aisosa is Happy");
+      if (walletName != "") setProcessTx(true);
+    }, 2000);
+    return () => clearTimeout(timeoutId);
+  }, [walletName]);
+
+  const {
+    data: walletAddress,
+    isError,
+    isLoading,
+  } = checkDeployedWalletTx(walletName, processTx);
+
+  useEffect(() => {
+    console.log("The wallet address i knowwww", walletAddress);
+    setProcessTx(false);
+  }, [walletAddress]);
 
   return (
     <>

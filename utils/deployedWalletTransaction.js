@@ -2,14 +2,13 @@ import { useContractRead } from "wagmi";
 import abi from "./abi";
 import walletFactoryAddress from "./address";
 
-function checkDeployedWalletTx(walletName) {
+function checkDeployedWalletTx(walletName, processTx) {
   const contractRead = useContractRead({
-    address: walletFactoryAddress,
+    address: processTx && walletFactoryAddress,
     abi: abi["walletFactory"],
     functionName: "deployedWallets",
     args: [walletName],
   });
-
   return contractRead;
 }
 
