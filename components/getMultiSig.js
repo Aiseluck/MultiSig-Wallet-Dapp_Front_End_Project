@@ -1,49 +1,55 @@
 import multiSig from "@/styles/multiSign.module.css";
 import { useState } from "react";
 import { utils } from "ethers";
+import createWalletTx from "@/utils/createWalletTransaction";
+import checkDeployedWalletTx from "@/utils/deployedWalletTransaction";
 
 function MultiSig() {
   const [addressList, setAddressList] = useState([""]);
-  const [numConfirmation, setNumConfirmation] = useState(0);
+  const [numConfirmation, setNumConfirmation] = useState(1);
   const [walletName, setWalletName] = useState("");
+  const [addressOk, setAdressOk] = useState(false);
 
   console.log(addressList);
 
+  const checkAddress = (_addresses) => {
+    let addresses_ok = true;
+    for (let i = 0; i < _addresses.length; i++) {
+      if (!utils.isAddress(_addresses[i])) {
+        addresses_ok = false;
+        break; //return Address i is invalid
+      }
+    }
+    if (!addresses_ok) setAdressOk(false);
+    else setAdressOk(true);
+  };
   const adjustOwners = () => {
     setAddressList((initial) => [...initial, ""]);
+    setAdressOk(false);
   };
 
   const removeOwner = (i) => {
     let newAddress = [...addressList];
     newAddress.splice(i, 1);
     setAddressList(newAddress);
+    checkAddress(newAddress);
   };
 
   const handleChangeOwner = (value, i) => {
     const inputAddress = [...addressList];
     inputAddress[i] = value.target.value;
+    checkAddress(inputAddress);
     setAddressList(inputAddress);
   };
 
   const handleValidator = (e) => {
-    setNumConfirmation(e.target.value);
+    if (e.target.value <= addressList.length) {
+      setNumConfirmation(e.target.value);
+    }
   };
 
   const handleWalletName = (e) => {
     setWalletName(e.target.value);
-  };
-
-  const handleCreateWallet = () => {
-    let sus = true;
-    for (let i = 0; i < addressList.length; i++) {
-      if (!utils.isAddress(addressList[i])) {
-        sus = false;
-        break; //return Address i is invalid
-      }
-    }
-
-    console.log("Output of Address is", sus);
-    console.log("Number of Validation is ", numConfirmation);
   };
 
   return (
@@ -80,7 +86,6 @@ function MultiSig() {
             <div>Enter the number of Confirmation</div>
             <input
               type="number"
-              placeholder="Enter number of Confirmations Required"
               value={numConfirmation}
               onChange={(e) => handleValidator(e)}
             />
@@ -93,7 +98,10 @@ function MultiSig() {
               onChange={(e) => handleWalletName(e)}
             />
           </div>
-          <button onClick={() => handleCreateWallet()}>
+          <button
+            onClick={() => console.log("I am clicked")}
+            disabled={!addressOk || numConfirmation < 1}
+          >
             Proceed in Creating Wallet
           </button>
         </div>

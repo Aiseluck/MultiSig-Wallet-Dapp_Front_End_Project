@@ -1,4 +1,4 @@
-export default abi = {
+const abi = {
   walletFactory: [
     {
       anonymous: false,
@@ -393,3 +393,5 @@ export default abi = {
     },
   ],
 };
+
+export default abi;
