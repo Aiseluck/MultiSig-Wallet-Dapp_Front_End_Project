@@ -2,17 +2,11 @@
   box-sizing: border-box;
   padding: 0;
   margin: 0;
+  font-family: "Rubik", sans-serif;
 }
 
 html {
-  background-color: #1b232a;
-}
-body {
-  background: linear-gradient(
-    to bottom right,
-    rgba(94, 213, 168, 0) 20.83%,
-    rgba(94, 213, 168, 0.15) 100%
-  );
+  background-color: #eeeeee;
 }
 
 html,

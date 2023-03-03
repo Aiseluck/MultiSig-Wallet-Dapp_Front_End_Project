@@ -1,10 +1,13 @@
 import multiSig from "@/styles/multiSign.module.css";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { utils } from "ethers";
 import createWalletTx from "@/utils/createWalletTransaction";
 import checkDeployedWalletTx from "@/utils/deployedWalletTransaction";
+import MultiSigAddressContext from "@/globalContext";
 
 function MultiSig() {
+  const [importName, setImportName] = useState("");
+  const [importProcessTx, setImportProcessTx] = useState(false);
   const [addressList, setAddressList] = useState([""]);
   const [numConfirmation, setNumConfirmation] = useState(1);
   const [walletName, setWalletName] = useState("");
@@ -12,6 +15,38 @@ function MultiSig() {
   const [processTx, setProcessTx] = useState(false);
   const [isNewWalletName, setisNewWalletName] = useState(false);
   const [createMultiSigTx, setCreateMultiSigTx] = useState(false);
+  const [createSuccessful, setCreateSuccessful] = useState(false);
+  const [multiSigAddress, setMultiSigAddress] = useContext(
+    MultiSigAddressContext
+  );
+
+  const handleImportWalletName = (e) => {
+    setImportName(e.target.value);
+  };
+
+  const {
+    data: ImportAddress,
+    isError: importError,
+    isLoading: walletimportLoading,
+  } = checkDeployedWalletTx(importName, importProcessTx);
+
+  const proceedinImport = () => {
+    setImportProcessTx(true);
+  };
+
+  useEffect(() => {
+    if (ImportAddress != null) {
+      if (parseInt(ImportAddress) == 0) {
+        console.log("Import Address does not exist");
+        setImportProcessTx(false);
+      } else {
+        setMultiSigAddress(ImportAddress);
+        setImportProcessTx(false);
+      }
+    }
+  }, [ImportAddress]);
+
+  // For Handling the Import of Accounts Ends here
 
   const checkAddress = (_addresses) => {
     let addresses_ok = true;
@@ -23,6 +58,7 @@ function MultiSig() {
         addresses_ok = false;
         break;
       }
+      utils.to;
       if (!utils.isAddress(_addresses[i])) {
         addresses_ok = false;
         break; //return Address i is invalid
@@ -75,6 +111,7 @@ function MultiSig() {
     data: walletAddress,
     isError,
     isLoading: walletinfoLoading,
+    refetch: refetchMultiSigAddress,
   } = checkDeployedWalletTx(walletName, processTx);
 
   useEffect(() => {
@@ -110,9 +147,11 @@ function MultiSig() {
     console.log("Wallet Addresses is", addressList);
     console.log("Number of Confirmation is", numConfirmation);
     console.log("Wallet Name is ", walletName);
-    write();
-    setisNewWalletName(false);
-    setCreateMultiSigTx(false);
+    if (write != null) {
+      write();
+      setisNewWalletName(false);
+      setCreateMultiSigTx(false);
+    }
   };
 
   useEffect(() => {
@@ -122,6 +161,13 @@ function MultiSig() {
       TransactionResponse.wait(1).then((transactionReceipt) => {
         console.log("Printing the Transaction Receipt");
         console.log(transactionReceipt);
+        let _address = transactionReceipt.logs[0].topics[2];
+        _address = _address.replace(/0{24}/, "");
+        console.log(
+          `Address is ${_address} and if address${utils.isAddress(_address)}`
+        );
+        setMultiSigAddress(_address);
+        setCreateSuccessful(true);
       });
     }
   }, [TransactionResponse]);
@@ -130,17 +176,28 @@ function MultiSig() {
     <>
       <div className={multiSig.main}>
         <div className={multiSig.import}>
-          <div className={multiSig.tite}>Import MultiSig Wallet</div>
+          <div className={multiSig.title}>Import MultiSig Wallet</div>
           <div className={multiSig.input}>
-            <input placeholder="Enter MultiSig ID or Address" />
+            <input
+              placeholder="Enter MultiSig Wallet Name"
+              value={importName}
+              onChange={handleImportWalletName}
+            />
             <div>
-              <button>Import Wallet</button>
+              <button
+                onClick={() => {
+                  proceedinImport();
+                  console.log("I am called");
+                }}
+              >
+                Import Wallet
+              </button>
             </div>
           </div>
         </div>
         <div className={multiSig.divider}></div>
         <div className={multiSig.createWallet}>
-          <div className={multiSig.tite}>Create MultSig Wallet</div>
+          <div className={multiSig.title}>Create MultSig Wallet</div>
           <div className={multiSig.addresses}>
             {addressList.map((address, i) => {
               return (
@@ -150,12 +207,19 @@ function MultiSig() {
                     value={address}
                     onChange={(e) => handleChangeOwner(e, i)}
                   />
-                  <div onClick={() => removeOwner(i)}>X</div>
+                  <div
+                    className={multiSig.cancel}
+                    onClick={() => removeOwner(i)}
+                  >
+                    X
+                  </div>
                 </div>
               );
             })}
           </div>
-          <button onClick={() => adjustOwners()}>Add Owners</button>
+          <button onClick={() => adjustOwners()} id={multiSig.owner}>
+            Add Owners
+          </button>
           <div className={multiSig.validator}>
             <div>Enter the number of Confirmation</div>
             <input
@@ -167,7 +231,7 @@ function MultiSig() {
           <div className={multiSig.walletName}>
             <div>Enter WalletName</div>
             <input
-              placeholder="Enter Wallet name, this would be imoortant for wallet recovery"
+              placeholder="Enter Wallet name"
               value={walletName}
               onChange={(e) => handleWalletName(e)}
             />
@@ -176,7 +240,9 @@ function MultiSig() {
             onClick={() => handleCreateWallet()}
             disabled={!addressOk || numConfirmation < 1 || !isNewWalletName}
           >
-            Proceed in Creating Wallet
+            {createSuccessful
+              ? "MultiSig Wallet Successful"
+              : "Proceed in Creating Wallet"}
           </button>
         </div>
       </div>

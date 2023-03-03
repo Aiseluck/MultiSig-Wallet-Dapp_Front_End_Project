@@ -4,7 +4,6 @@
   justify-content: space-between;
   align-items: center;
   height: 100%;
-  color: #5ed5a8;
 }
 
 .import {
@@ -15,10 +14,32 @@
   justify-content: space-around;
 }
 
+.title {
+  border: transparent;
+  border-bottom: 2px solid #000000;
+  font-style: normal;
+  font-weight: bolder;
+}
+
 .input {
   display: flex;
   flex-direction: column;
   align-items: center;
+}
+
+.main input {
+  width: 207px;
+  height: 32px;
+  background: #ffffff;
+
+  border: 3px solid #333333;
+  border-radius: 8px;
+  margin-bottom: 9px;
+  font-weight: 200;
+}
+
+.main input::placeholder {
+  font-weight: 100;
 }
 
 .divider {
@@ -36,6 +57,21 @@
   align-items: center;
 }
 
+.addresses {
+  animation: fadeIn 1s;
+  -webkit-animation: fadeIn 1s;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
 .createWallet {
   flex-basis: 70%;
   justify-content: space-around;
@@ -43,17 +79,31 @@
 
 .owner {
   display: flex;
+  align-items: center;
+}
+
+.cancel {
+  margin: 0px 5px;
 }
 
 .main input {
   border: none;
   text-align: center;
-  font-weight: bold;
 }
 
 .main button {
-  background-color: #5ed5a8;
-  color: #171d22;
+  background: #333333;
+
+  border: 1px solid #333333;
+  border-radius: 8px;
+  width: 150px;
+  color: #ffffff;
+  padding: 9px;
+}
+
+#owner {
+  color: #333333;
+  background-color: transparent;
 }
 
 .owner input {

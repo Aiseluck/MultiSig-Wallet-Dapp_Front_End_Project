@@ -1,11 +1,13 @@
+import MultiSigAddressContext from "@/globalContext";
 import header from "@/styles/Header.module.css";
 import { useWeb3Modal } from "@web3modal/react";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useAccount } from "wagmi";
 
 function Header() {
   const { address, isConnected } = useAccount();
   const { open } = useWeb3Modal();
+  const [multiSigAddress] = useContext(MultiSigAddressContext);
 
   // to avoid nextJs hyrdation issue when developing we need to get the status of the account after initial Render
 
@@ -22,13 +24,18 @@ function Header() {
   return (
     <>
       <div className={header.header}>
+        <div className={header.multiSigAddress}>
+          {multiSigAddress
+            ? `MultSigWallet at ${multiSigAddress.slice(0, 6)}`
+            : "MultiSigWallet not Connected"}
+        </div>
         <button
           className={header.text}
           id={_isConnected ? header.connected : header.notconnected}
           onClick={open}
         >
           {_isConnected
-            ? `Connected to ${_address.slice(0, 6)}`
+            ? `Connected to ${_address.slice(0, 9)}`
             : "Connect Wallet"}
         </button>
       </div>

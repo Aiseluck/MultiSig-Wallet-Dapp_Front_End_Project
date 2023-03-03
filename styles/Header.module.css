@@ -4,7 +4,7 @@
     width: 100%;
     height: 85px;
     display: flex;
-    justify-content: right;
+    justify-content: space-between;
     align-items: center;
     top: 0;
   }
@@ -18,8 +18,21 @@
     font-size: 15px;
     border-radius: 10px;
     overflow: hidden;
-    background-color: #5ed5a8;
-    color: white;
+    background-color: #ffffff;
+    border: 2px solid #333333;
+  }
+
+  .multiSigAddress {
+    margin: 0 30px;
+    width: 120px;
+    padding: 6px;
+    border-style: solid;
+    text-align: center;
+    font-size: 12px;
+    border-radius: 12px;
+    font-weight: 300;
+    overflow: hidden;
+    color: #333333;
     border-color: transparent;
   }
 
@@ -31,7 +44,7 @@
     0% {
     }
     100% {
-      background-color: black;
+      background-color: rgb(158, 169, 169);
     }
   }
 }
@@ -42,7 +55,7 @@
     width: 100%;
     height: 85px;
     display: flex;
-    justify-content: right;
+    justify-content: space-between;
     align-items: center;
     top: 0;
   }
@@ -56,9 +69,22 @@
     font-size: 15px;
     border-radius: 10px;
     overflow: hidden;
-    background-color: #5ed5a8;
-    color: white;
+    background-color: #ffffff;
+    border: 2px solid #333333;
+  }
+
+  .multiSigAddress {
+    margin: 0 30px;
+    width: 120px;
+    padding: 6px;
+    border-style: solid;
+    text-align: center;
+    font-size: 12px;
+    border-radius: 10px;
+    overflow: hidden;
+    color: #333333;
     border-color: transparent;
+    font-weight: 300;
   }
 
   #notconnected {
@@ -69,7 +95,7 @@
     0% {
     }
     100% {
-      background-color: black;
+      background-color: rgb(158, 169, 169);
     }
   }
 }

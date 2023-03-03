@@ -4,10 +4,13 @@ import { Inter } from "next/font/google";
 import styles from "@/styles/Home.module.css";
 import Header from "@/components/Header";
 import Body from "@/components/body";
+import MultiSigAddressContext from "@/globalContext";
+import { useState } from "react";
 
 const inter = Inter({ subsets: ["latin"] });
 
 export default function Home() {
+  const [multiSigAddress, setMultiSigAddress] = useState(null);
   return (
     <>
       <Head>
@@ -16,12 +19,17 @@ export default function Home() {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
+
       <main className={styles.main}>
         <div className={styles.content}>
-          <Header />
-          <Body />
-          {/* Head Section to be created */}
-          {/* Body Section to be created */}
+          <MultiSigAddressContext.Provider
+            value={[multiSigAddress, setMultiSigAddress]}
+          >
+            <Header />
+            <Body />
+            {/* Head Section to be created */}
+            {/* Body Section to be created */}
+          </MultiSigAddressContext.Provider>
         </div>
       </main>
     </>
