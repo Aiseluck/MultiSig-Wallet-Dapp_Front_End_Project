@@ -10,17 +10,29 @@ function MultiSig() {
   const [walletName, setWalletName] = useState("");
   const [addressOk, setAdressOk] = useState(false);
   const [processTx, setProcessTx] = useState(false);
+  const [isNewWalletName, setisNewWalletName] = useState(false);
+  const [createMultiSigTx, setCreateMultiSigTx] = useState(false);
 
   const checkAddress = (_addresses) => {
     let addresses_ok = true;
+    const dup = {};
+    if (_addresses.length == 0) addresses_ok = false;
     for (let i = 0; i < _addresses.length; i++) {
+      if (dup[`${_addresses[i]}`] == true) {
+        console.log("Duplicate Exist");
+        addresses_ok = false;
+        break;
+      }
       if (!utils.isAddress(_addresses[i])) {
         addresses_ok = false;
         break; //return Address i is invalid
       }
+      dup[`${_addresses[i]}`] = true;
     }
-    if (!addresses_ok) setAdressOk(false);
-    else setAdressOk(true);
+    if (!addresses_ok) {
+      setAdressOk(false);
+      setCreateMultiSigTx(false);
+    } else setAdressOk(true);
   };
   const adjustOwners = () => {
     setAddressList((initial) => [...initial, ""]);
@@ -55,20 +67,64 @@ function MultiSig() {
     const timeoutId = setTimeout(() => {
       console.log("Aisosa is Happy");
       if (walletName != "") setProcessTx(true);
-    }, 2000);
+    }, 700);
     return () => clearTimeout(timeoutId);
   }, [walletName]);
 
   const {
     data: walletAddress,
     isError,
-    isLoading,
+    isLoading: walletinfoLoading,
   } = checkDeployedWalletTx(walletName, processTx);
 
   useEffect(() => {
-    console.log("The wallet address i knowwww", walletAddress);
+    if (!walletinfoLoading && walletAddress) {
+      if (parseInt(walletAddress) == 0) setisNewWalletName(true);
+      else setisNewWalletName(false);
+    }
+
     setProcessTx(false);
   }, [walletAddress]);
+
+  useEffect(() => {
+    if (addressOk && isNewWalletName) {
+      setCreateMultiSigTx(true);
+      console.log("Calling setCreateMultiSig Tx to true");
+    }
+    console.log("Hey ia m running inside the Tester");
+  }, [walletName, numConfirmation, addressList, addressOk, isNewWalletName]);
+
+  const failed = () => {
+    console.log("Hey, the Transaction failed");
+  };
+
+  const { data: TransactionResponse, write } = createWalletTx(
+    walletName,
+    addressList,
+    numConfirmation,
+    createMultiSigTx,
+    failed
+  );
+
+  const handleCreateWallet = () => {
+    console.log("Wallet Addresses is", addressList);
+    console.log("Number of Confirmation is", numConfirmation);
+    console.log("Wallet Name is ", walletName);
+    write();
+    setisNewWalletName(false);
+    setCreateMultiSigTx(false);
+  };
+
+  useEffect(() => {
+    console.log("Printing Transaction Response");
+    console.log(TransactionResponse);
+    if (TransactionResponse != null) {
+      TransactionResponse.wait(1).then((transactionReceipt) => {
+        console.log("Printing the Transaction Receipt");
+        console.log(transactionReceipt);
+      });
+    }
+  }, [TransactionResponse]);
 
   return (
     <>
@@ -111,14 +167,14 @@ function MultiSig() {
           <div className={multiSig.walletName}>
             <div>Enter WalletName</div>
             <input
-              placeholder="Enter Wallet name, this would be imoortant fro wallet recovery"
+              placeholder="Enter Wallet name, this would be imoortant for wallet recovery"
               value={walletName}
               onChange={(e) => handleWalletName(e)}
             />
           </div>
           <button
-            onClick={() => console.log("I am clicked")}
-            disabled={!addressOk || numConfirmation < 1}
+            onClick={() => handleCreateWallet()}
+            disabled={!addressOk || numConfirmation < 1 || !isNewWalletName}
           >
             Proceed in Creating Wallet
           </button>

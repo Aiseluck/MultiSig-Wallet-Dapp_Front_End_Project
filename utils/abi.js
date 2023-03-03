@@ -53,7 +53,7 @@ const abi = {
       name: "deployedWallets",
       outputs: [
         {
-          internalType: "contract MutiSigWallet",
+          internalType: "address",
           name: "",
           type: "address",
         },
