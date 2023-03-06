@@ -6,6 +6,10 @@
   height: 100%;
 }
 
+#walletCreated {
+  display: none;
+}
+
 .import {
   display: flex;
   flex-direction: column;

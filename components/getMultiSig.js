@@ -38,6 +38,7 @@ function MultiSig() {
     if (ImportAddress != null) {
       if (parseInt(ImportAddress) == 0) {
         console.log("Import Address does not exist");
+        console.log(ImportAddress);
         setImportProcessTx(false);
       } else {
         setMultiSigAddress(ImportAddress);
@@ -166,7 +167,7 @@ function MultiSig() {
         console.log(
           `Address is ${_address} and if address${utils.isAddress(_address)}`
         );
-        setMultiSigAddress(_address);
+        //setMultiSigAddress(_address);
         setCreateSuccessful(true);
       });
     }
@@ -174,7 +175,10 @@ function MultiSig() {
 
   return (
     <>
-      <div className={multiSig.main}>
+      <div
+        className={multiSig.main}
+        id={multiSigAddress ? multiSig.walletCreated : ""}
+      >
         <div className={multiSig.import}>
           <div className={multiSig.title}>Import MultiSig Wallet</div>
           <div className={multiSig.input}>
