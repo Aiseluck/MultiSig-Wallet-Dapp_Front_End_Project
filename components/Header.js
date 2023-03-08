@@ -7,7 +7,9 @@ import { useAccount } from "wagmi";
 function Header() {
   const { address, isConnected } = useAccount();
   const { open } = useWeb3Modal();
-  const [multiSigAddress] = useContext(MultiSigAddressContext);
+  const { multiSigAddress, isAddressOwner } = useContext(
+    MultiSigAddressContext
+  );
 
   // to avoid nextJs hyrdation issue when developing we need to get the status of the account after initial Render
 
@@ -26,7 +28,9 @@ function Header() {
       <div className={header.header}>
         <div className={header.multiSigAddress}>
           {multiSigAddress
-            ? `MultSigWallet at ${multiSigAddress.slice(0, 6)}`
+            ? isAddressOwner
+              ? `Owner of MultSigWallet at ${multiSigAddress.slice(0, 6)}`
+              : `Not a Owner of MultSigWallet at ${multiSigAddress.slice(0, 6)}`
             : "MultiSigWallet not Connected"}
         </div>
         <button

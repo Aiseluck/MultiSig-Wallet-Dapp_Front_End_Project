@@ -3,9 +3,12 @@ import { useContext, useEffect, useState } from "react";
 import { utils } from "ethers";
 import createWalletTx from "@/utils/createWalletTransaction";
 import checkDeployedWalletTx from "@/utils/deployedWalletTransaction";
+import checkAddressOwner from "@/utils/isAddressOwner";
 import MultiSigAddressContext from "@/globalContext";
+import { useAccount } from "wagmi";
 
 function MultiSig() {
+  const { address, isConnected } = useAccount();
   const [importName, setImportName] = useState("");
   const [importProcessTx, setImportProcessTx] = useState(false);
   const [addressList, setAddressList] = useState([""]);
@@ -16,7 +19,7 @@ function MultiSig() {
   const [isNewWalletName, setisNewWalletName] = useState(false);
   const [createMultiSigTx, setCreateMultiSigTx] = useState(false);
   const [createSuccessful, setCreateSuccessful] = useState(false);
-  const [multiSigAddress, setMultiSigAddress] = useContext(
+  const { multiSigAddress, setMultiSigAddress, setAddressOwner } = useContext(
     MultiSigAddressContext
   );
 
@@ -30,6 +33,8 @@ function MultiSig() {
     isLoading: walletimportLoading,
   } = checkDeployedWalletTx(importName, importProcessTx);
 
+  const { data: _isAddressOwner } = checkAddressOwner(multiSigAddress, address);
+
   const proceedinImport = () => {
     setImportProcessTx(true);
   };
@@ -42,10 +47,16 @@ function MultiSig() {
         setImportProcessTx(false);
       } else {
         setMultiSigAddress(ImportAddress);
+
         setImportProcessTx(false);
       }
     }
   }, [ImportAddress]);
+
+  useEffect(() => {
+    console.log("Is Address Owner", _isAddressOwner);
+    setAddressOwner(_isAddressOwner);
+  }, [_isAddressOwner]);
 
   // For Handling the Import of Accounts Ends here
 

@@ -6,7 +6,7 @@ import Authorize from "./wallet/authorize";
 import Transaction from "./wallet/transaction";
 
 function MultiSigWallet() {
-  const [multiSigAddress] = useContext(MultiSigAddressContext);
+  const { multiSigAddress } = useContext(MultiSigAddressContext);
   const [view, setView] = useState(1);
   return (
     <div className={wallet.wallet} id={multiSigAddress ? "" : wallet.notActive}>

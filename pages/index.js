@@ -11,6 +11,7 @@ const inter = Inter({ subsets: ["latin"] });
 
 export default function Home() {
   const [multiSigAddress, setMultiSigAddress] = useState(null);
+  const [isAddressOwner, setAddressOwner] = useState(false);
   return (
     <>
       <Head>
@@ -23,7 +24,12 @@ export default function Home() {
       <main className={styles.main}>
         <div className={styles.content}>
           <MultiSigAddressContext.Provider
-            value={[multiSigAddress, setMultiSigAddress]}
+            value={{
+              multiSigAddress,
+              setMultiSigAddress,
+              isAddressOwner,
+              setAddressOwner,
+            }}
           >
             <Header />
             <Body />

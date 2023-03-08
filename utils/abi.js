@@ -201,6 +201,25 @@ const abi = {
     {
       inputs: [
         {
+          internalType: "address",
+          name: "_address",
+          type: "address",
+        },
+      ],
+      name: "AddressIsOwner",
+      outputs: [
+        {
+          internalType: "bool",
+          name: "",
+          type: "bool",
+        },
+      ],
+      stateMutability: "view",
+      type: "function",
+    },
+    {
+      inputs: [
+        {
           internalType: "uint256",
           name: "_txNounce",
           type: "uint256",
