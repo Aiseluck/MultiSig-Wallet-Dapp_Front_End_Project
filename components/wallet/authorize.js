@@ -117,6 +117,38 @@ function Authorize({ view }) {
     }
   }, [AuthTransactionResponse]);
 
+  //End of Authorization
+
+  //Start of execution
+  const ExecuteError = () => {
+    console.log("An error occured when executing the Transaction");
+  };
+
+  const { data: ExecutionResponse, write: exe_write } = ProceedTx(
+    !(execute_id === "" || execute_id < 0) && multiSigAddress,
+    execute_id,
+    "executeTransaction",
+    ExecuteError
+  );
+
+  const ExecTx = () => {
+    console.log("Sending the Execution Transaction");
+    if (exe_write != null) exe_write();
+  };
+
+  useEffect(() => {
+    if (ExecutionResponse != null) {
+      console.log("Printing Transaction Response");
+      console.log(ExecutionResponse);
+      ExecutionResponse.wait(1).then((TransactionReceipt) => {
+        console.log("Printing Transaction Receipt");
+        console.log(TransactionReceipt);
+      });
+    }
+  }, [ExecutionResponse]);
+
+  //End of Execution
+
   return (
     <div className={auth.main} id={view == 1 ? "" : auth.notActive}>
       <div className={auth.createTx}>
@@ -233,7 +265,10 @@ function Authorize({ view }) {
               setExecute_id(e.target.value);
             }}
           />
-          <button disabled={execute_id === "" || execute_id < 0}>
+          <button
+            disabled={execute_id === "" || execute_id < 0}
+            onClick={ExecTx}
+          >
             Execute Transaction
           </button>
         </div>
