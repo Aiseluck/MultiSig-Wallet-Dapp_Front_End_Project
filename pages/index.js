@@ -2,8 +2,8 @@ import Head from "next/head";
 import Image from "next/image";
 import { Inter } from "next/font/google";
 import styles from "@/styles/Home.module.css";
-import Header from "@/components/Header";
-import Body from "@/components/body";
+import Header from "@/layout/Header";
+import Body from "@/layout/body";
 import MultiSigAddressContext from "@/globalContext";
 import { useState } from "react";
 
@@ -12,6 +12,7 @@ const inter = Inter({ subsets: ["latin"] });
 export default function Home() {
   const [multiSigAddress, setMultiSigAddress] = useState(null);
   const [isAddressOwner, setAddressOwner] = useState(false);
+  const [walletEthBalance, setWalletEthBalance] = useState(0);
   return (
     <>
       <Head>
@@ -29,6 +30,8 @@ export default function Home() {
               setMultiSigAddress,
               isAddressOwner,
               setAddressOwner,
+              walletEthBalance,
+              setWalletEthBalance,
             }}
           >
             <Header />
