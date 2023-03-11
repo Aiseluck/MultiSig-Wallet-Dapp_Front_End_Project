@@ -6,6 +6,7 @@ import Header from "@/layout/Header";
 import Body from "@/layout/body";
 import MultiSigAddressContext from "@/globalContext";
 import { useState } from "react";
+import VerifyView from "@/layout/verifyView";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -35,6 +36,7 @@ export default function Home() {
             }}
           >
             <Header />
+            <VerifyView />
             <Body />
             {/* Head Section to be created */}
             {/* Body Section to be created */}
