@@ -1,5 +1,5 @@
 import multiSig from "@/styles/multiSign.module.css";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { utils } from "ethers";
 import createWalletTx from "@/utils/createWalletTransaction";
 import checkDeployedWalletTx from "@/utils/deployedWalletTransaction";
@@ -7,6 +7,7 @@ import checkAddressOwner from "@/utils/isAddressOwner";
 import MultiSigAddressContext from "@/globalContext";
 import { useAccount, useBalance } from "wagmi";
 import { formatEther } from "ethers/lib/utils.js";
+import Button from "@/components/button";
 
 function MultiSig() {
   const { address, isConnected } = useAccount();
@@ -19,17 +20,15 @@ function MultiSig() {
   const [processTx, setProcessTx] = useState(false);
   const [isNewWalletName, setisNewWalletName] = useState(false);
   const [createMultiSigTx, setCreateMultiSigTx] = useState(false);
-  const [createSuccessful, setCreateSuccessful] = useState(false);
   const {
     multiSigAddress,
     setMultiSigAddress,
     setAddressOwner,
     setWalletEthBalance,
   } = useContext(MultiSigAddressContext);
-
-  const handleImportWalletName = (e) => {
-    setImportName(e.target.value);
-  };
+  const [importButtonUI, setImportButtonUI] = useState("pending");
+  const [createButtonUI, setCreateButtonUI] = useState("pending");
+  const walletNameInput = useRef();
 
   const {
     data: ImportAddress,
@@ -41,6 +40,7 @@ function MultiSig() {
 
   const proceedinImport = () => {
     setImportProcessTx(true);
+    setImportName(walletNameInput.current.value);
   };
 
   useEffect(() => {
@@ -49,6 +49,8 @@ function MultiSig() {
         console.log("Import Address does not exist");
         console.log(ImportAddress);
         setImportProcessTx(false);
+        setImportButtonUI("failed");
+        setTimeout(() => setImportButtonUI("pending"), 3000);
       } else {
         setMultiSigAddress(ImportAddress);
         console.log(`${ImportAddress}`);
@@ -159,6 +161,8 @@ function MultiSig() {
 
   const failed = () => {
     console.log("Hey, the Transaction failed");
+    setCreateButtonUI("failed");
+    setTimeout(() => setCreateButtonUI("pending"), 5000);
   };
 
   const { data: TransactionResponse, write } = createWalletTx(
@@ -175,7 +179,7 @@ function MultiSig() {
     console.log("Wallet Name is ", walletName);
     if (write != null) {
       write();
-      setisNewWalletName(false);
+      setCreateButtonUI("loading");
       setCreateMultiSigTx(false);
     }
   };
@@ -193,7 +197,7 @@ function MultiSig() {
           `Address is ${_address} and if address${utils.isAddress(_address)}`
         );
         //setMultiSigAddress(_address);
-        setCreateSuccessful(true);
+        setCreateButtonUI("success");
       });
     }
   }, [TransactionResponse]);
@@ -209,19 +213,15 @@ function MultiSig() {
           <div className={multiSig.input}>
             <input
               placeholder="Enter MultiSig Wallet Name"
-              value={importName}
-              onChange={handleImportWalletName}
+              ref={walletNameInput}
             />
-            <div>
-              <button
-                onClick={() => {
-                  proceedinImport();
-                  console.log("I am called");
-                }}
-              >
-                Import Wallet
-              </button>
-            </div>
+            <Button
+              initialText={"Import Wallet"}
+              failureText={"Wallet not created"}
+              state={importButtonUI}
+              isOk={""}
+              clickFunction={() => proceedinImport()}
+            />
           </div>
         </div>
         <div className={multiSig.divider}></div>
@@ -265,14 +265,30 @@ function MultiSig() {
               onChange={(e) => handleWalletName(e)}
             />
           </div>
-          <button
+          {/* <button
             onClick={() => handleCreateWallet()}
             disabled={!addressOk || numConfirmation < 1 || !isNewWalletName}
           >
             {createSuccessful
               ? "MultiSig Wallet Successful"
               : "Proceed in Creating Wallet"}
-          </button>
+          </button> */}
+          <Button
+            initialText={"Proceed in Creating Wallet"}
+            failureText={"Wallet Creation Failed"}
+            successText={"MultiSig Wallet Successful"}
+            state={createButtonUI}
+            clickFunction={() => handleCreateWallet()}
+            isOk={[
+              addressOk,
+              isNewWalletName,
+              !(numConfirmation < 1),
+              write != null ||
+                createButtonUI == "loading" ||
+                createButtonUI == "success" ||
+                createButtonUI == "failed",
+            ]}
+          />
         </div>
       </div>
     </>

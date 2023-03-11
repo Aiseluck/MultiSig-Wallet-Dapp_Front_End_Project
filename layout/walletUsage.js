@@ -10,10 +10,10 @@ function MultiSigWallet() {
   const [view, setView] = useState(1);
   return (
     <div className={wallet.wallet} id={multiSigAddress ? "" : wallet.notActive}>
-      <>
+      <div className={wallet.operations}>
         <Authorize view={view} />
         <Transaction view={view} />
-      </>
+      </div>
       <NavBar page={[view, setView]} />
     </div>
   );

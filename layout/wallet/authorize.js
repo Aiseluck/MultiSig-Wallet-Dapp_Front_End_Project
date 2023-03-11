@@ -5,6 +5,7 @@ import auth from "./authorize.module.css";
 import createTransactionTx from "@/utils/createTx";
 import ProceedTx from "@/utils/authorizationTx";
 import checkHex from "@/utils/checkHex";
+import Button from "@/components/button";
 
 function Authorize({ view }) {
   const [focus, setFocus] = useState("");
@@ -19,14 +20,12 @@ function Authorize({ view }) {
   const { multiSigAddress, isAddressOwner } = useContext(
     MultiSigAddressContext
   );
-  const [createTxResult, setCreateTxResult] = useState("pending");
+
+  const [createButtonUI, setCreateButtonUI] = useState("pending");
+  const [authButtonUI, setAuthButtonUI] = useState("pending");
+  const [executeButtonUI, setExecuteButtonUI] = useState("pending");
 
   //For Hanfling Animate of Result whether failed or Succsessfull
-
-  const createTxOutcome = (_result) => {
-    setCreateTxResult(_result);
-    setTimeout(() => setCreateTxResult("pending"), 8000);
-  };
 
   useEffect(() => {
     if (utils.isAddress(sendAddress)) setAdressOk(true);
@@ -56,7 +55,8 @@ function Authorize({ view }) {
 
   const createError = () => {
     console.log("An Error occured when creating Transaction");
-    createTxOutcome("failed");
+    setCreateButtonUI("failed");
+    setTimeout(() => setCreateButtonUI("pending"), 6000);
   };
 
   const { data: TransactionResponse, write } = createTransactionTx(
@@ -71,7 +71,10 @@ function Authorize({ view }) {
     console.log("Address is ", sendAddress);
     console.log("Amount of Ethers to send is", parse_eth);
     console.log("CallData is ", callData);
-    if (write != null) write();
+    if (write != null) {
+      write();
+      setCreateButtonUI("loading");
+    }
   };
 
   useEffect(() => {
@@ -81,7 +84,8 @@ function Authorize({ view }) {
       TransactionResponse.wait(1).then((TransactionReceipt) => {
         console.log("Printing the Transaction Receipt");
         console.log(TransactionReceipt);
-        createTxOutcome("success");
+        setCreateButtonUI("success");
+        setTimeout(() => setCreateButtonUI("pending"), 6000);
       });
     }
   }, [TransactionResponse]);
@@ -92,6 +96,8 @@ function Authorize({ view }) {
 
   const AuthorizeError = () => {
     console.log("An Error occured when Authorizing theTransaction");
+    setAuthButtonUI("failed");
+    setTimeout(() => setAuthButtonUI("pending"), 6000);
   };
 
   const { data: AuthTransactionResponse, write: auth_write } = ProceedTx(
@@ -103,7 +109,10 @@ function Authorize({ view }) {
 
   const AuthTx = () => {
     console.log("Sending the Authorize Transaction");
-    if (auth_write != null) auth_write();
+    if (auth_write != null) {
+      auth_write();
+      setAuthButtonUI("loading");
+    }
   };
 
   useEffect(() => {
@@ -113,6 +122,8 @@ function Authorize({ view }) {
       AuthTransactionResponse.wait(1).then((TransactionReceipt) => {
         console.log("Printing Transaction receipt");
         console.log(TransactionReceipt);
+        setAuthButtonUI("success");
+        setTimeout(() => setAuthButtonUI("pending"), 6000);
       });
     }
   }, [AuthTransactionResponse]);
@@ -122,6 +133,8 @@ function Authorize({ view }) {
   //Start of execution
   const ExecuteError = () => {
     console.log("An error occured when executing the Transaction");
+    setExecuteButtonUI("failed");
+    setTimeout(() => setExecuteButtonUI("pending"), 6000);
   };
 
   const { data: ExecutionResponse, write: exe_write } = ProceedTx(
@@ -133,7 +146,10 @@ function Authorize({ view }) {
 
   const ExecTx = () => {
     console.log("Sending the Execution Transaction");
-    if (exe_write != null) exe_write();
+    if (exe_write != null) {
+      exe_write();
+      setExecuteButtonUI("loading");
+    }
   };
 
   useEffect(() => {
@@ -143,6 +159,8 @@ function Authorize({ view }) {
       ExecutionResponse.wait(1).then((TransactionReceipt) => {
         console.log("Printing Transaction Receipt");
         console.log(TransactionReceipt);
+        setExecuteButtonUI("success");
+        setTimeout(() => setExecuteButtonUI("pending"), 6000);
       });
     }
   }, [ExecutionResponse]);
@@ -196,16 +214,22 @@ function Authorize({ view }) {
             />
             <p>CallData</p>
           </div>
-          <button
-            disabled={!(addressOk && isAddressOwner && isvalidCallData)}
-            onClick={createTx}
-          >
-            {createTxResult == "pending"
-              ? "Create Transaction"
-              : createTxResult == "success"
-              ? "Transaction created Successfully"
-              : "Transaction Creation Failed"}
-          </button>
+          <Button
+            initialText={"Create Transaction"}
+            failureText={"Transaction Creation Failed"}
+            successText={"Transaction created Successfully"}
+            state={createButtonUI}
+            clickFunction={createTx}
+            isOk={[
+              addressOk,
+              isAddressOwner,
+              isvalidCallData,
+              write != null ||
+                createButtonUI == "loading" ||
+                createButtonUI == "success" ||
+                createButtonUI == "failed",
+            ]}
+          />
         </div>
       </div>
       <div className={auth.authorize}>
@@ -233,12 +257,21 @@ function Authorize({ view }) {
             value={authorize_id}
             onChange={(e) => setAuthorize_id(e.target.value)}
           />
-          <button
-            disabled={authorize_id === "" || authorize_id < 0}
-            onClick={AuthTx}
-          >
-            Authorize Transaction
-          </button>
+          <Button
+            initialText={"Authorize Transaction"}
+            failureText={"Authorization Failed"}
+            successText={"Authorization Successful"}
+            state={authButtonUI}
+            clickFunction={AuthTx}
+            isOk={[
+              authorize_id != "",
+              !(authorize_id < 0),
+              auth_write != null ||
+                authButtonUI == "loading" ||
+                authButtonUI == "success" ||
+                authButtonUI == "failed",
+            ]}
+          />
         </div>
       </div>
       <div className={auth.execute}>
@@ -265,12 +298,27 @@ function Authorize({ view }) {
               setExecute_id(e.target.value);
             }}
           />
-          <button
+          {/* <button
             disabled={execute_id === "" || execute_id < 0}
             onClick={ExecTx}
           >
             Execute Transaction
-          </button>
+          </button> */}
+          <Button
+            initialText={"Execute Transaction"}
+            failureText={"Tx Execution Failed"}
+            successText={"Tx Execution Successful"}
+            state={executeButtonUI}
+            clickFunction={ExecTx}
+            isOk={[
+              execute_id != "",
+              !(execute_id < 0),
+              exe_write != null ||
+                executeButtonUI == "loading" ||
+                executeButtonUI == "success" ||
+                executeButtonUI == "failed",
+            ]}
+          />
         </div>
       </div>
     </div>
