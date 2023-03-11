@@ -219,8 +219,11 @@ function MultiSig() {
               initialText={"Import Wallet"}
               failureText={"Wallet not created"}
               state={importButtonUI}
-              isOk={""}
-              clickFunction={() => proceedinImport()}
+              isOk={[address]}
+              clickFunction={() => {
+                proceedinImport();
+                console.log(address);
+              }}
             />
           </div>
         </div>
@@ -265,14 +268,6 @@ function MultiSig() {
               onChange={(e) => handleWalletName(e)}
             />
           </div>
-          {/* <button
-            onClick={() => handleCreateWallet()}
-            disabled={!addressOk || numConfirmation < 1 || !isNewWalletName}
-          >
-            {createSuccessful
-              ? "MultiSig Wallet Successful"
-              : "Proceed in Creating Wallet"}
-          </button> */}
           <Button
             initialText={"Proceed in Creating Wallet"}
             failureText={"Wallet Creation Failed"}
@@ -283,6 +278,7 @@ function MultiSig() {
               addressOk,
               isNewWalletName,
               !(numConfirmation < 1),
+              address,
               write != null ||
                 createButtonUI == "loading" ||
                 createButtonUI == "success" ||

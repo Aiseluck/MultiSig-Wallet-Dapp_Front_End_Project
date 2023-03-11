@@ -6,8 +6,10 @@ import createTransactionTx from "@/utils/createTx";
 import ProceedTx from "@/utils/authorizationTx";
 import checkHex from "@/utils/checkHex";
 import Button from "@/components/button";
+import { useAccount } from "wagmi";
 
 function Authorize({ view }) {
+  const { address } = useAccount();
   const [focus, setFocus] = useState("");
   const [sendAddress, setSendAddress] = useState("");
   const [addressOk, setAdressOk] = useState(false);
@@ -224,6 +226,7 @@ function Authorize({ view }) {
               addressOk,
               isAddressOwner,
               isvalidCallData,
+              address,
               write != null ||
                 createButtonUI == "loading" ||
                 createButtonUI == "success" ||
@@ -265,6 +268,7 @@ function Authorize({ view }) {
             clickFunction={AuthTx}
             isOk={[
               authorize_id != "",
+              address,
               !(authorize_id < 0),
               auth_write != null ||
                 authButtonUI == "loading" ||
@@ -312,6 +316,7 @@ function Authorize({ view }) {
             clickFunction={ExecTx}
             isOk={[
               execute_id != "",
+              address,
               !(execute_id < 0),
               exe_write != null ||
                 executeButtonUI == "loading" ||
