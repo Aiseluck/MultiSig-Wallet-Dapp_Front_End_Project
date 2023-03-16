@@ -1,6 +1,5 @@
 function checkHex(s) {
   s = s.toUpperCase();
-  console.log(s);
   let n = s.length;
 
   if (n % 2 == 1) return false;

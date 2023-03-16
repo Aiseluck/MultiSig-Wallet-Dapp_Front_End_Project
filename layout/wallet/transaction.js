@@ -19,19 +19,12 @@ function Transaction({ view }) {
 
   const proceed = () => {
     setProcessTx(true);
-    console.log(inputElement.current.value);
     setTx_id(inputElement.current.value);
   };
 
   useEffect(() => {
     if (txDetailsData != null) {
-      console.log("Printing Transaction Details");
-      console.log(txDetailsData);
       setTxValues(txDetailsData);
-      console.log("Legth is currently ", txDetailsData.length);
-      for (let i = 0; i < txDetailsData.length; i++) {
-        console.log(i, "is currently", txDetailsData[i]);
-      }
     } else setTxValues([]);
   }, [txDetailsData]);
 

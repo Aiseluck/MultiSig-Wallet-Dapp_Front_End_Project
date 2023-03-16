@@ -7,13 +7,17 @@ import { useAccount } from "wagmi";
 function Header() {
   const { address, isConnected } = useAccount();
   const { open } = useWeb3Modal();
-  const { multiSigAddress, isAddressOwner, walletEthBalance } = useContext(
-    MultiSigAddressContext
-  );
+  const {
+    multiSigAddress,
+    isAddressOwner,
+    walletEthBalance,
+    _address,
+    setAddress,
+  } = useContext(MultiSigAddressContext);
 
   // to avoid nextJs hyrdation issue when developing we need to get the status of the account after initial Render
+  //This happens because the useAccount and useWeb3Modal makes use of the window.localStorage which is not available on the Nextjs Server Side
 
-  const [_address, setAddress] = useState(null);
   const [_isConnected, setIsConnected] = useState(null);
 
   useEffect(() => {

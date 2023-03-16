@@ -8,7 +8,6 @@ function createTransactionTx(
   callData,
   error
 ) {
-  console.log("Calling CallData is ", callData);
   const { config } = usePrepareContractWrite({
     address: multiSigAddress,
     abi: abi["multiSigWallet"],

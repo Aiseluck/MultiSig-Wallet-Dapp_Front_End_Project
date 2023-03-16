@@ -1,5 +1,5 @@
 import multiSig from "@/styles/multiSign.module.css";
-import { useContext, useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useReducer, useRef, useState } from "react";
 import { utils } from "ethers";
 import createWalletTx from "@/utils/createWalletTransaction";
 import checkDeployedWalletTx from "@/utils/deployedWalletTransaction";
@@ -9,68 +9,94 @@ import { useAccount, useBalance } from "wagmi";
 import { formatEther } from "ethers/lib/utils.js";
 import Button from "@/components/button";
 
-function MultiSig() {
-  const { address, isConnected } = useAccount();
+const initial_processTx = {
+  importWallet: false,
+  addressOk: false,
+  checkDeployedWallet: false,
+  isNewWalletName: false,
+  createWallet: false,
+};
+
+const Process_Reducer = (state, action) => {
+  let newState = { ...state };
+  newState[action.type] = action.state;
+  return newState;
+};
+
+const initialButtonUI = {
+  import: "pending",
+  create: "pending",
+};
+
+const buttonUI_reducer = (state, action) => {
+  let newState = { ...state };
+  newState[action.buttonType] = action.buttonState;
+  return newState;
+};
+
+function MultiSigCreation() {
   const [importName, setImportName] = useState("");
-  const [importProcessTx, setImportProcessTx] = useState(false);
   const [addressList, setAddressList] = useState([""]);
   const [numConfirmation, setNumConfirmation] = useState(1);
   const [walletName, setWalletName] = useState("");
-  const [addressOk, setAdressOk] = useState(false);
-  const [processTx, setProcessTx] = useState(false);
-  const [isNewWalletName, setisNewWalletName] = useState(false);
-  const [createMultiSigTx, setCreateMultiSigTx] = useState(false);
+
+  const [ProcessTx, dispatchProcess] = useReducer(
+    Process_Reducer,
+    initial_processTx
+  );
+  const [buttonUI, dispatchButtonUI] = useReducer(
+    buttonUI_reducer,
+    initialButtonUI
+  );
+
   const {
     multiSigAddress,
     setMultiSigAddress,
     setAddressOwner,
     setWalletEthBalance,
+    _address: address,
   } = useContext(MultiSigAddressContext);
-  const [importButtonUI, setImportButtonUI] = useState("pending");
-  const [createButtonUI, setCreateButtonUI] = useState("pending");
   const walletNameInput = useRef();
 
   const {
     data: ImportAddress,
     isError: importError,
     isLoading: walletimportLoading,
-  } = checkDeployedWalletTx(importName, importProcessTx);
+  } = checkDeployedWalletTx(importName, ProcessTx.importWallet);
 
   const { data: _isAddressOwner } = checkAddressOwner(multiSigAddress, address);
 
   const proceedinImport = () => {
-    setImportProcessTx(true);
+    dispatchProcess({ type: "importWallet", state: true });
     setImportName(walletNameInput.current.value);
   };
 
   useEffect(() => {
     if (ImportAddress != null) {
       if (parseInt(ImportAddress) == 0) {
-        console.log("Import Address does not exist");
-        console.log(ImportAddress);
-        setImportProcessTx(false);
-        setImportButtonUI("failed");
-        setTimeout(() => setImportButtonUI("pending"), 3000);
+        dispatchProcess({ type: "importWallet", state: false });
+        dispatchButtonUI({ buttonType: "import", buttonState: "failed" });
+        setTimeout(
+          () =>
+            dispatchButtonUI({ buttonType: "import", buttonState: "pending" }),
+          3000
+        );
       } else {
         setMultiSigAddress(ImportAddress);
-        console.log(`${ImportAddress}`);
-        setImportProcessTx(false);
+        dispatchProcess({ type: "importWallet", state: true });
       }
     }
   }, [ImportAddress]);
 
   useEffect(() => {
-    console.log("Is Address Owner", _isAddressOwner);
     setAddressOwner(_isAddressOwner);
   }, [_isAddressOwner]);
 
   const { data: _ethBalance } = useBalance({ address: multiSigAddress });
 
   useEffect(() => {
-    console.log("Printing out account Balance at the Moment");
     if (_ethBalance != null) {
       setWalletEthBalance(`${formatEther(_ethBalance.value)}`);
-      console.log(_ethBalance);
     }
   }, [_ethBalance]);
 
@@ -82,7 +108,6 @@ function MultiSig() {
     if (_addresses.length == 0) addresses_ok = false;
     for (let i = 0; i < _addresses.length; i++) {
       if (dup[`${_addresses[i]}`] == true) {
-        console.log("Duplicate Exist");
         addresses_ok = false;
         break;
       }
@@ -94,13 +119,13 @@ function MultiSig() {
       dup[`${_addresses[i]}`] = true;
     }
     if (!addresses_ok) {
-      setAdressOk(false);
-      setCreateMultiSigTx(false);
-    } else setAdressOk(true);
+      dispatchProcess({ type: "addressOk", state: false });
+      dispatchProcess({ type: "createWallet", state: false });
+    } else dispatchProcess({ type: "addressOk", state: true });
   };
   const adjustOwners = () => {
     setAddressList((initial) => [...initial, ""]);
-    setAdressOk(false);
+    dispatchProcess({ type: "addressOk", state: false });
   };
 
   const removeOwner = (i) => {
@@ -129,8 +154,8 @@ function MultiSig() {
 
   useEffect(() => {
     const timeoutId = setTimeout(() => {
-      console.log("Aisosa is Happy");
-      if (walletName != "") setProcessTx(true);
+      if (walletName != "")
+        dispatchProcess({ type: "checkDeployedWallet", state: true });
     }, 700);
     return () => clearTimeout(timeoutId);
   }, [walletName]);
@@ -140,64 +165,64 @@ function MultiSig() {
     isError,
     isLoading: walletinfoLoading,
     refetch: refetchMultiSigAddress,
-  } = checkDeployedWalletTx(walletName, processTx);
+  } = checkDeployedWalletTx(walletName, ProcessTx.checkDeployedWallet);
 
   useEffect(() => {
     if (!walletinfoLoading && walletAddress) {
-      if (parseInt(walletAddress) == 0) setisNewWalletName(true);
-      else setisNewWalletName(false);
+      if (parseInt(walletAddress) == 0)
+        dispatchProcess({ type: "isNewWalletName", state: true });
+      else dispatchProcess({ type: "isNewWalletName", state: false });
     }
 
-    setProcessTx(false);
+    dispatchProcess({ type: "checkDeployedWallet", state: false });
   }, [walletAddress]);
 
   useEffect(() => {
-    if (addressOk && isNewWalletName) {
-      setCreateMultiSigTx(true);
-      console.log("Calling setCreateMultiSig Tx to true");
+    if (ProcessTx.addressOk && ProcessTx.isNewWalletName) {
+      dispatchProcess({ type: "createWallet", state: true });
     }
-    console.log("Hey ia m running inside the Tester");
-  }, [walletName, numConfirmation, addressList, addressOk, isNewWalletName]);
+  }, [
+    walletName,
+    numConfirmation,
+    addressList,
+    ProcessTx.addressOk,
+    ProcessTx.isNewWalletName,
+  ]);
 
   const failed = () => {
-    console.log("Hey, the Transaction failed");
-    setCreateButtonUI("failed");
-    setTimeout(() => setCreateButtonUI("pending"), 5000);
+    dispatchButtonUI({ buttonType: "create", buttonState: "failed" });
+    setTimeout(
+      () => dispatchButtonUI({ buttonType: "create", buttonState: "pending" }),
+      5000
+    );
   };
 
   const { data: TransactionResponse, write } = createWalletTx(
     walletName,
     addressList,
     numConfirmation,
-    createMultiSigTx,
+    ProcessTx.createWallet,
     failed
   );
 
   const handleCreateWallet = () => {
-    console.log("Wallet Addresses is", addressList);
-    console.log("Number of Confirmation is", numConfirmation);
-    console.log("Wallet Name is ", walletName);
     if (write != null) {
       write();
-      setCreateButtonUI("loading");
-      setCreateMultiSigTx(false);
+      dispatchButtonUI({ buttonType: "create", buttonState: "loading" });
+      dispatchProcess({ type: "createWallet", state: false });
     }
   };
 
   useEffect(() => {
-    console.log("Printing Transaction Response");
-    console.log(TransactionResponse);
     if (TransactionResponse != null) {
       TransactionResponse.wait(1).then((transactionReceipt) => {
-        console.log("Printing the Transaction Receipt");
-        console.log(transactionReceipt);
         let _address = transactionReceipt.logs[0].topics[2];
         _address = _address.replace(/0{24}/, "");
-        console.log(
-          `Address is ${_address} and if address${utils.isAddress(_address)}`
-        );
+        // console.log(
+        //   `Address is ${_address} and if address${utils.isAddress(_address)}`
+        // );
         //setMultiSigAddress(_address);
-        setCreateButtonUI("success");
+        dispatchButtonUI({ buttonType: "create", buttonState: "success" });
       });
     }
   }, [TransactionResponse]);
@@ -218,11 +243,10 @@ function MultiSig() {
             <Button
               initialText={"Import Wallet"}
               failureText={"Wallet not created"}
-              state={importButtonUI}
+              state={buttonUI.import}
               isOk={[address]}
               clickFunction={() => {
                 proceedinImport();
-                console.log(address);
               }}
             />
           </div>
@@ -272,17 +296,17 @@ function MultiSig() {
             initialText={"Proceed in Creating Wallet"}
             failureText={"Wallet Creation Failed"}
             successText={"MultiSig Wallet Successful"}
-            state={createButtonUI}
+            state={buttonUI.create}
             clickFunction={() => handleCreateWallet()}
             isOk={[
-              addressOk,
-              isNewWalletName,
+              ProcessTx.addressOk,
+              ProcessTx.isNewWalletName,
               !(numConfirmation < 1),
               address,
               write != null ||
-                createButtonUI == "loading" ||
-                createButtonUI == "success" ||
-                createButtonUI == "failed",
+                buttonUI.create == "loading" ||
+                buttonUI.create == "success" ||
+                buttonUI.create == "failed",
             ]}
           />
         </div>
@@ -291,4 +315,4 @@ function MultiSig() {
   );
 }
 
-export default MultiSig;
+export default MultiSigCreation;
