@@ -9,7 +9,7 @@ This Project is for the Development of a MultiSig Dapp that interact with the Sm
 1. Clone the repository
 
 ```bash
- git clone https://github.com/your-username/multisig-contract.git
+ git clone https://github.com/Aiseluck/MultiSig-Wallet-Dapp_Front_End_Project
 ```
 
 2. Install Dependencies
