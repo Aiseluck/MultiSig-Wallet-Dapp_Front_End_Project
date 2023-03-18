@@ -40,6 +40,6 @@ This Project is for the Development of a MultiSig Dapp that interact with the Sm
 
 ## Live Project
 
-You can check out he Live Project [here](https://multisigwallet.onrender.com/)
+You can check out he Live Project [here](https://multisig.onrender.com/)
 
 If you would like to connect with me [on Twitter](https://twitter.com/Aiseluck)
