@@ -1,38 +1,45 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# MultiSig Dapp using Nextjs/Reactjs, Ethersjs, Wagmi and WalletConnent
 
-## Getting Started
+## Introduction
 
-First, run the development server:
+This Project is for the Development of a MultiSig Dapp that interact with the Smart Contract already deployed using the [sibling Repository](https://github.com/Aiseluck/MultiSig-Wallet-Project)
+
+## Installation
+
+1. Clone the repository
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
+ git clone https://github.com/your-username/multisig-contract.git
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2. Install Dependencies
 
-You can start editing the page by modifying `pages/index.js`. The page auto-updates as you edit the file.
+```bash
+ yarn install
+```
 
-[API routes](https://nextjs.org/docs/api-routes/introduction) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.js`.
+## Usage
 
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/api-routes/introduction) instead of React pages.
+1.  create a `.env` file and add your `Wallet Connect API Key`. For Example
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+    ```javascript
+    PROJECT_ID = "Your API Key goes in here";
+    ```
 
-## Learn More
+2.  Update the `walletFactoryAddress variable` in the `utils/address.js` to the deployed Contract Address on your Desired Network and update the `chains variable` to the Desired Network
 
-To learn more about Next.js, take a look at the following resources:
+3.  Run command
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+    ```shell
+    yarn next build
+    yarn next export
+    ```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+4.  Serving on a Static CDN
+    The `out` Directory would contain the SPA Static Output
 
-## Deploy on Vercel
+## Live Project
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+You can check out he Live Project [here](https://multisigwallet.onrender.com/)
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+If you would like to connect with me [on Twitter](https://twitter.com/Aiseluck)
