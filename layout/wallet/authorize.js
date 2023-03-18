@@ -27,8 +27,8 @@ function Authorize({ view }) {
   const [parse_eth, setParse_eth] = useState(0);
   const [callData, setCallData] = useState("0x");
   const [isvalidCallData, setisValidCallData] = useState(true);
-  const [authorize_id, setAuthorize_id] = useState(0);
-  const [execute_id, setExecute_id] = useState(0);
+  const [authorize_id, setAuthorize_id] = useState("");
+  const [execute_id, setExecute_id] = useState("");
   const {
     multiSigAddress,
     isAddressOwner,
